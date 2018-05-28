@@ -21,8 +21,8 @@ The goals / steps of this project are the following:
 
 [image1]: ./output_images/undist_cb_output.jpg "Undistorted Chessboard"
 [image2]: ./output_images/undist_test3.jpg "Road Transformed"
-[image3]: ./output_images/c.jpg "Binary Example"
-[image4]: ./output_images/warped_straight_lines.jpg "Warp Example"
+[image3]: ./output_images/combined_test3.jpg "Binary Example"
+[image4]: ./output_images/warped_straight_lines1.jpg "Warp Example"
 [image5]: ./output_images/color_fit_lines.jpg "Fit Visual"
 [image6]: ./output_images/example_output.jpg "Output"
 [video1]: ./project_video.mp4 "Video"
