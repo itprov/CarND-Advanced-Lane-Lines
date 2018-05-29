@@ -23,9 +23,9 @@ The goals / steps of this project are the following:
 [image2]: ./output_images/undist_test3.jpg "Road Transformed"
 [image3]: ./output_images/combined_test3.jpg "Binary Example"
 [image4]: ./output_images/warped_straight_lines1.jpg "Warp Example"
-[image5]: ./output_images/color_fit_lines.jpg "Fit Visual"
-[image6]: ./output_images/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image5]: ./output_images/color_fit_lines.png "Fit Pipeline Visual"
+[image6]: ./output_images/output_test3.jpg "Output Example"
+[video1]: ./output_videos/project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -60,53 +60,58 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color (G channel, S channel) and gradient (Sobel X) thresholds to generate a binary image (thresholding steps in the function undistort_transform()).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I experimented with various combinations of color transforms (R/G/B, H/S/V, H/L/S) and various threshold values for each until I found a good combination of color (G channel, S channel) and gradient (Sobel X) thresholds to generate a binary image (thresholding steps in the function undistort_transform() in the 9th code cell).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
 ![alt text][image3]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `unwarp()`, which appears in the 7th code cell of the IPython notebook.  The `unwarp()` function takes as inputs an image (`img`), and contains specific sets of source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
 ```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+src = np.array([[
+        (0.47 * img_shape[1], 0.62 * img_shape[0]),
+        (0.54 * img_shape[1], 0.62 * img_shape[0]),
+        (0.86 * img_shape[1], img_shape[0]),
+        (0.16 * img_shape[1], img_shape[0])
+        ]], dtype=np.float32)
+dst = np.array([[
+        (0.25 * img_shape[1], 0),
+        (0.81 * img_shape[1], 0),
+        (0.75 * img_shape[1], img_shape[0]),
+        (0.25 * img_shape[1], img_shape[0])
+        ]], dtype=np.float32)
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   |
 |:-------------:|:-------------:|
-| 585, 460      | 320, 0        |
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 602, 446      | 320, 0        |
+| 691, 446      | 1036, 0       |
+| 1101, 720     | 960, 720      |
+| 205, 720      | 320, 720      |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
-![alt text][image4]
+<img src="./test_images/straight_lines1.jpg" width="240"> <img src="./output_images/warped_straight_lines1.jpg" width="240">
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Then I defined a function `fit_lines_sliding_window()` using the code provided in Lesson 15 (33. "Finding the Lines") to fit a 2nd degree polynomial for a given image (the 10th code cell in the IPynb notebook). I parameterized the function to find the polynomials for left and right lane boundaries from scratch using the sliding window algorithm (when `blind_search = True`) or use previously found polynomial to search in a margin around those lines (when `blind_search = False`). Especially in the latter case, there is a possibility of erroneous line detection, so I created a function that will check that the 2 lines are parallel in a reasonable error margin (`check_sanity()` defined in the same cell). I used the provided test images to experiment with the polynomial search margin and sanity check error margin until found values that work best for all of the test images. I  Finally, I created a pipeline function `find_lane_pipeline()` - defined in the 11th code cell - that will invoke these other functions to generate the desired output.
 
 ![alt text][image5]
 
+
+<img src="./output_images/lanes_test1.jpg" width="240"> <img src="./output_images/lanes_test2.jpg" width="240">
+
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I did this in the same function `find_lane_pipeline()` - defined in the 11th code cell. I used the sample code provided in the Lesson 15 (35. "Measuring Curvature") and some ideas from the Udacity FAQ video on Youtube. 
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in the same function `find_lane_pipeline()` - defined in the 11th code cell. Here is an example of my result on a test image:
 
 ![alt text][image6]
 
@@ -116,7 +121,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./output_videos/project_video.mp4)
 
 ---
 
@@ -125,3 +130,7 @@ Here's a [link to my video result](./project_video.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+
+The approach I took was to try all pipeline steps on the provided 6 test images after selecting the warping source and destination vertices using one of the straight lanes sample image.
+
+One issue I saw is that the left boundary of the lane is incorrectly identified in a short section of the video. There is a 2nd white line to the left of the yellow line, which is getting detected as the left boundary. Thus, my pipeline failed to find the left boundary accurately in the frames in that section. To make the pipeline more robust, I should add more input samples to my test data, and see if another combination of H/L/S/V and R/G threshold transforms, and/or other values of thresholds, search margin, and error margin works better. I can also try the Convolution algorithm instead of the histogram-based approach, and changing the logic of the histogram-based approach itself.
