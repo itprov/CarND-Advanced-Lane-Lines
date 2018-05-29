@@ -49,7 +49,7 @@ I start by preparing "object points", which will be the (x, y, z) coordinates of
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to a test chessboard image using the `cv2.undistort()` function and obtained this result:
 
-<img src="./camera_cal/calibration1.jpg" width="240"> <img src="./output_images/undist_cb_output.jpg" width="240">
+<img src="./camera_cal/calibration1.jpg" width="240">     <img src="./output_images/undist_cb_output.jpg" width="240">
 
 ### Pipeline (single images)
 
@@ -94,7 +94,7 @@ This resulted in the following source and destination points:
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
-<img src="./test_images/straight_lines1.jpg" width="240"> <img src="./output_images/warped_straight_lines1.jpg" width="240">
+<img src="./test_images/straight_lines1.jpg" width="240">     <img src="./output_images/warped_straight_lines1.jpg" width="240">
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
@@ -102,12 +102,13 @@ Then I defined a function `fit_lines_sliding_window()` using the code provided i
 
 ![alt text][image5]
 
+Here are couple of the intermediate images showing identified lane boundaries and the lane area. These were unwarped using the reverse perspective transform matrix, and then superimposed with the input images to create the final output images, such as the one in section 6 below.
 
-<img src="./output_images/lanes_test1.jpg" width="240"> <img src="./output_images/lanes_test2.jpg" width="240">
+<img src="./output_images/lanes_test1.jpg" width="240">     <img src="./output_images/lanes_test2.jpg" width="240">
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in the same function `find_lane_pipeline()` - defined in the 11th code cell. I used the sample code provided in the Lesson 15 (35. "Measuring Curvature") and some ideas from the Udacity FAQ video on Youtube. 
+I did this in the same function `find_lane_pipeline()` - defined in the 11th code cell. I used the sample code provided in the Lesson 15 (35. "Measuring Curvature") and some ideas from the Udacity FAQ video on Youtube.
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
